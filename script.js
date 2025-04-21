@@ -3,7 +3,9 @@ let cpuChart, memoryChart;
 const maxDataPoints = 60; // Show last 60 seconds of data
 const cpuData = [];
 const memoryData = [];
+const BASE_URL = "https://flask-monitor-app.onrender.com";  // your backend URL
 
+const res = await fetch(`${BASE_URL}/api/processes`);
 function switchTab(tab) {
     currentTab = tab;
     const buttons = document.querySelectorAll('.tab-button');
