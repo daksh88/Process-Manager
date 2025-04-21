@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Process Manager</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Process Manager</h1>
+  <div class="tab-container">
+    <button class="tab-button active" onclick="switchTab('apps')">Applications</button>
+    <button class="tab-button" onclick="switchTab('system')">System Processes</button>
+    <button class="tab-button" onclick="switchTab('monitor')">System Monitor</button>
+  </div>
+  
+  <div id="apps-tab" class="tab-content active">
+    <div>
+      <input type="text" id="search" placeholder="Search by process name...">
+      <button onclick="loadProcesses()">Refresh</button>
+    </div>
+    <div id="usage"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>PID</th>
+          <th>Name</th>
+          <th>CPU %</th>
+          <th>Memory %</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="processTable"></tbody>
+    </table>
+  </div>
+
+  <div id="system-tab" class="tab-content">
+    <div>
+      <input type="text" id="system-search" placeholder="Search by process name...">
+      <button onclick="loadProcesses()">Refresh</button>
+    </div>
+    <div id="system-usage"></div>
+    <table>
+      <thead>
+        <tr>
+          <th>PID</th>
+          <th>Name</th>
+          <th>CPU %</th>
+          <th>Memory %</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="systemTable"></tbody>
+    </table>
+  </div>
+
+  <div id="monitor-tab" class="tab-content">
+    <div class="usage-indicators">
+        <div class="usage-card">
+            <h3>CPU Usage</h3>
+            <div class="usage-value" id="monitor-cpu">0%</div>
+        </div>
+        <div class="usage-card">
+            <h3>Memory Usage</h3>
+            <div class="usage-value" id="monitor-memory">0%</div>
+        </div>
+    </div>
+    <div class="charts-container">
+        <div class="chart-wrapper">
+            <canvas id="cpuChart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="memoryChart"></canvas>
+        </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
