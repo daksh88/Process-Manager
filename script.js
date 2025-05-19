@@ -1,11 +1,5 @@
 let currentTab = 'apps';
-let cpuChart, memoryChart;
-const maxDataPoints = 60; // Show last 60 seconds of data
-const cpuData = [];
-const memoryData = [];
-const BASE_URL = "https://flask-monitor-app.onrender.com";  // your backend URL
 
-const res = await fetch(`${BASE_URL}/api/processes`);
 function switchTab(tab) {
     currentTab = tab;
     const buttons = document.querySelectorAll('.tab-button');
@@ -17,112 +11,7 @@ function switchTab(tab) {
     event.target.classList.add('active');
     document.getElementById(`${tab}-tab`).classList.add('active');
     
-    if (tab === 'monitor' && !cpuChart) {
-        initializeCharts();
-    }
-    
-    if (tab === 'apps' || tab === 'system') {
-        loadProcesses();
-    }
-}
-
-function initializeCharts() {
-    const cpuCtx = document.getElementById('cpuChart').getContext('2d');
-    const memoryCtx = document.getElementById('memoryChart').getContext('2d');
-
-    cpuChart = new Chart(cpuCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'CPU Usage %',
-                data: [],
-                borderColor: '#3498db',
-                tension: 0.4,
-                fill: true,
-                backgroundColor: 'rgba(52, 152, 219, 0.1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            },
-            animation: {
-                duration: 0
-            }
-        }
-    });
-
-    memoryChart = new Chart(memoryCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Memory Usage %',
-                data: [],
-                borderColor: '#e74c3c',
-                tension: 0.4,
-                fill: true,
-                backgroundColor: 'rgba(231, 76, 60, 0.1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            },
-            animation: {
-                duration: 0
-            }
-        }
-    });
-}
-
-async function updateCharts() {
-    try {
-        const res = await fetch("http://127.0.0.1:5000/api/usage");
-        const data = await res.json();
-        
-        const now = new Date().toLocaleTimeString();
-        
-        // Update percentage displays
-        document.getElementById('monitor-cpu').textContent = `${data.cpu.toFixed(1)}%`;
-        document.getElementById('monitor-memory').textContent = `${data.memory.toFixed(1)}%`;
-        
-        cpuData.push(data.cpu);
-        memoryData.push(data.memory);
-        
-        if (cpuData.length > maxDataPoints) {
-            cpuData.shift();
-            memoryData.shift();
-        }
-        
-        const labels = Array(cpuData.length).fill('').map((_, i) => 
-            i === 0 || i === cpuData.length - 1 ? 
-            now : ''
-        );
-
-        if (cpuChart && memoryChart) {
-            cpuChart.data.labels = labels;
-            cpuChart.data.datasets[0].data = cpuData;
-            cpuChart.update();
-
-            memoryChart.data.labels = labels;
-            memoryChart.data.datasets[0].data = memoryData;
-            memoryChart.update();
-        }
-    } catch (error) {
-        console.error('Error updating charts:', error);
-    }
+    loadProcesses();
 }
 
 async function loadProcesses() {
@@ -226,13 +115,6 @@ async function showUsage() {
     document.getElementById("usage").innerText =
         `CPU Usage: ${data.cpu}% | Memory Usage: ${data.memory}%`;
 }
+
 setInterval(showUsage, 2000);
-
-// Update interval for charts (every second)
-setInterval(() => {
-    if (currentTab === 'monitor') {
-        updateCharts();
-    }
-}, 1000);
-
 loadProcesses();
