@@ -8,8 +8,7 @@ function switchTab(tab) {
     buttons.forEach(btn => btn.classList.remove('active'));
     tabs.forEach(tabContent => tabContent.classList.remove('active'));
     
-    // Find the button that triggered the event and set it active
-    // (event.target may not work if called inline, so use tab name)
+
     const tabIndex = ['apps', 'system', 'monitor'].indexOf(tab);
     if (tabIndex !== -1) buttons[tabIndex].classList.add('active');
     document.getElementById(`${tab}-tab`).classList.add('active');
@@ -17,7 +16,6 @@ function switchTab(tab) {
     if (tab === 'apps' || tab === 'system') {
         loadProcesses();
     }
-    // No need to reload charts, they update automatically
 }
 
 async function loadProcesses() {
@@ -32,14 +30,13 @@ async function loadProcesses() {
         const tbody = document.getElementById(currentTab === 'apps' ? "processTable" : "systemTable");
         tbody.innerHTML = "";
 
-        // Create Maps to store processes
         const appProcesses = new Map();
         const systemProcesses = new Map();
 
         data.forEach(proc => {
             const name = proc.name.toLowerCase();
             
-            // Define system process patterns
+             
             const isSystemProcess = 
                 name.includes('svchost') ||
                 name.includes('system') ||
@@ -56,7 +53,7 @@ async function loadProcesses() {
 
             if (!searchVal || name.includes(searchVal)) {
                 if (isSystemProcess && currentTab === 'system') {
-                    // Group system processes
+                     
                     if (systemProcesses.has(proc.name)) {
                         const existing = systemProcesses.get(proc.name);
                         existing.cpu_percent += proc.cpu_percent;
@@ -67,7 +64,7 @@ async function loadProcesses() {
                         systemProcesses.set(proc.name, proc);
                     }
                 } else if (!isSystemProcess && currentTab === 'apps') {
-                    // Store unique applications
+                     
                     if (!appProcesses.has(proc.name) || 
                         appProcesses.get(proc.name).cpu_percent < proc.cpu_percent) {
                         appProcesses.set(proc.name, proc);
@@ -76,7 +73,7 @@ async function loadProcesses() {
             }
         });
 
-        // Get the appropriate process list based on current tab
+         
         const processesToShow = Array.from(
             (currentTab === 'apps' ? appProcesses : systemProcesses).values()
         ).sort((a, b) => b.cpu_percent - a.cpu_percent);
@@ -115,7 +112,7 @@ async function terminate(pid) {
     loadProcesses();
 }
 
-// Add Chart.js support for CPU and Memory charts
+ 
 let cpuChart, memoryChart;
 let cpuData = [];
 let memoryData = [];
@@ -174,7 +171,7 @@ async function showUsage() {
     document.getElementById("usage").innerText =
         `CPU Usage: ${data.cpu}% | Memory Usage: ${data.memory}%`;
 
-    // Update charts
+     
     const now = new Date();
     const label = now.getHours().toString().padStart(2, '0') + ':' +
                   now.getMinutes().toString().padStart(2, '0') + ':' +
@@ -183,7 +180,7 @@ async function showUsage() {
     cpuData.push(data.cpu);
     memoryData.push(data.memory);
 
-    // Keep only last 30 points
+     
     if (chartLabels.length > 30) {
         chartLabels.shift();
         cpuData.shift();
