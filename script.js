@@ -6,12 +6,18 @@ function switchTab(tab) {
     const tabs = document.querySelectorAll('.tab-content');
     
     buttons.forEach(btn => btn.classList.remove('active'));
-    tabs.forEach(tab => tab.classList.remove('active'));
+    tabs.forEach(tabContent => tabContent.classList.remove('active'));
     
-    event.target.classList.add('active');
+    // Find the button that triggered the event and set it active
+    // (event.target may not work if called inline, so use tab name)
+    const tabIndex = ['apps', 'system', 'monitor'].indexOf(tab);
+    if (tabIndex !== -1) buttons[tabIndex].classList.add('active');
     document.getElementById(`${tab}-tab`).classList.add('active');
     
-    loadProcesses();
+    if (tab === 'apps' || tab === 'system') {
+        loadProcesses();
+    }
+    // No need to reload charts, they update automatically
 }
 
 async function loadProcesses() {
@@ -109,12 +115,89 @@ async function terminate(pid) {
     loadProcesses();
 }
 
+// Add Chart.js support for CPU and Memory charts
+let cpuChart, memoryChart;
+let cpuData = [];
+let memoryData = [];
+let chartLabels = [];
+
+function setupCharts() {
+    const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+    const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+
+    cpuChart = new Chart(cpuCtx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'CPU Usage (%)',
+                data: cpuData,
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52,152,219,0.1)',
+                fill: true,
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { min: 0, max: 100 }
+            }
+        }
+    });
+
+    memoryChart = new Chart(memoryCtx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Memory Usage (%)',
+                data: memoryData,
+                borderColor: '#e67e22',
+                backgroundColor: 'rgba(230,126,34,0.1)',
+                fill: true,
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { min: 0, max: 100 }
+            }
+        }
+    });
+}
+
 async function showUsage() {
     const res = await fetch("http://127.0.0.1:5000/api/usage");
     const data = await res.json();
     document.getElementById("usage").innerText =
         `CPU Usage: ${data.cpu}% | Memory Usage: ${data.memory}%`;
+
+    // Update charts
+    const now = new Date();
+    const label = now.getHours().toString().padStart(2, '0') + ':' +
+                  now.getMinutes().toString().padStart(2, '0') + ':' +
+                  now.getSeconds().toString().padStart(2, '0');
+    chartLabels.push(label);
+    cpuData.push(data.cpu);
+    memoryData.push(data.memory);
+
+    // Keep only last 30 points
+    if (chartLabels.length > 30) {
+        chartLabels.shift();
+        cpuData.shift();
+        memoryData.shift();
+    }
+
+    if (cpuChart && memoryChart) {
+        cpuChart.update();
+        memoryChart.update();
+    }
 }
 
-setInterval(showUsage, 2000);
-loadProcesses();
+window.addEventListener('DOMContentLoaded', () => {
+    setupCharts();
+    loadProcesses();
+    setInterval(showUsage, 2000);
+});

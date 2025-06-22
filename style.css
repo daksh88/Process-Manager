@@ -120,3 +120,32 @@ button[onclick="terminate(${proc.pid})"]:hover {
 .tab-content.active {
     display: block;
 }
+
+.charts-container {
+    display: flex;
+    flex-direction: column;      /* Stack charts vertically */
+    gap: 30px;
+    align-items: stretch;        /* Stretch children to container width */
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.chart-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 30px 40px 20px 40px;
+    width: 100%;                /* Take full width */
+    max-width: 100vw;           /* Prevent overflow */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;       /* Stretch canvas horizontally */
+}
+
+#cpuChart, #memoryChart {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 400px !important;   /* Even bigger height */
+    display: block;
+}

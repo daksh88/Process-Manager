@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <title>Process Manager</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <!-- Add Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <h1>Process Manager</h1>
   <div class="tab-container">
     <button class="tab-button active" onclick="switchTab('apps')">Applications</button>
     <button class="tab-button" onclick="switchTab('system')">System Processes</button>
+    <button class="tab-button" onclick="switchTab('monitor')">System Monitor</button>
   </div>
-  
+
   <div id="apps-tab" class="tab-content active">
     <div>
       <input type="text" id="search" placeholder="Search by process name...">
@@ -50,6 +53,19 @@
       </thead>
       <tbody id="systemTable"></tbody>
     </table>
+  </div>
+
+  <!-- New Monitor Tab -->
+  <div id="monitor-tab" class="tab-content">
+    <div class="charts-container">
+      <div class="chart-wrapper">
+        <canvas id="cpuChart" height="80"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="memoryChart" height="80"></canvas>
+      </div>
+    </div>
+    <div id="usage"></div>
   </div>
 
   <script src="script.js"></script>

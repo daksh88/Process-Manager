@@ -1,9 +1,22 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS  # Add this import
+from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 import psutil
+import os
 
 app = Flask(__name__)
-CORS(app)  # Add this line
+CORS(app)
+
+@app.route("/")
+def index():
+    return send_from_directory('.', 'index.html')
+
+@app.route("/style.css")
+def style():
+    return send_from_directory('.', 'style.css')
+
+@app.route("/script.js")
+def script():
+    return send_from_directory('.', 'script.js')
 
 @app.route("/api/processes", methods=["GET"])
 def get_processes():
